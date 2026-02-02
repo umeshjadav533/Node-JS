@@ -35,7 +35,7 @@ const updateContact = async (req, res) => {
 };
 
 const deleteContact = async (req, res) => {
-    await contact.findByIdAndUpdate(req.params.id, req.body);
+    await contact.findByIdAndDelete(req.params.id, req.body);
     res.redirect('/');
 };
 

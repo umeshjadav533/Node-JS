@@ -1,0 +1,106 @@
+import mongoose from "mongoose";
+import contact from "../models/contact.model.js";
+
+const getContacts = async (req, res) => {
+    const { page = 1, limit = 3 } = req.query;
+    const options = {
+        page: parseInt(page),
+        limit: parseInt(limit)
+    };
+
+    const contacts = await contact.paginate({}, options);
+    res.render("home", {
+        totalDocs: contacts.totalDocs,
+        limit: contacts.limit,
+        totalPages: contacts.totalPages,
+        currentPage: contacts.page,
+        counter: contacts.pagingCounter,
+        hasPrevPage: contacts.hasPrevPage,
+        hasNextPage: contacts.hasNextPage,
+        prevPage: contacts.prevPage,
+        nextPage: contacts.nextPage,
+        contacts: contacts.docs
+        
+    });
+//   "limit": 3,
+//   "totalPages": 1,
+//   "page": 1,
+//   "pagingCounter": 1,
+//   "hasPrevPage": false,
+//   "hasNextPage": false,
+//   "prevPage": null,
+//   "nextPage": null
+};
+
+const showSingleContact = async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        res.render('404', { message: "Invalid Id" });
+    }
+
+    try {
+        const singleContact = await contact.findById(req.params.id);
+        if (!singleContact) return res.render('404', { message: "Contact nnot found" })
+        res.render("show-contact", { singleContact });
+    } catch (error) {
+        res.redner('500', { message: error })
+    }
+
+};
+
+const addContact = async (req, res) => {
+    try {
+        // await contact.insertOne({
+        //     first_name: req.body.first_name,
+        //     last_name: req.body.last_name,
+        //     email: req.body.email,
+        //     phone: req.body.phone,
+        //     address: req.body.address
+        // });
+        await contact.create(req.body)
+        res.redirect("/")
+    } catch (error) {
+        res.render('500', { message: error })
+    }
+
+};
+
+const showupdatedContact = async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        res.render('404', { message: "Invalid Id" });
+    }
+
+    try {
+        const singleContact = await contact.findById(req.params.id);
+        if (!singleContact) return res.render('404', { message: "Contact nnot found" })
+        res.render("update-contact", { singleContact });
+    } catch (error) {
+        res.redner('500', { message: error })
+    }
+};
+
+const updateContact = async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        res.render('404', { message: "Invalid Id" });
+    }
+
+    try {
+        const singleContact = await contact.findByIdAndUpdate(req.params.id, req.body);
+        if (!singleContact) return res.render('404', { message: "Contact nnot found" })
+        res.redirect('/');
+    } catch (error) {
+        res.redner('500', { message: error })
+    }
+};
+
+const deleteContact = async (req, res) => {
+    try {
+        const singleContact = await contact.findByIdAndDelete(req.params.id);
+        if (!singleContact) return res.render('404', { message: "Contact nnot found" })
+        res.redirect('/');
+    } catch (error) {
+        res.redner('500', { message: error })
+    }
+
+};
+
+export { getContacts, showSingleContact, addContact, showupdatedContact, updateContact, deleteContact }

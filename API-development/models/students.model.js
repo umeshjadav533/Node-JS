@@ -22,9 +22,14 @@ const studentSchema = new mongoose.Schema({
         required: true
     },
 
-    address: {
+    gender: {
         type: String,
+        enum: ["male", "female", "other"],
         required: true
+    },
+    
+    profile_pic: {
+        type: String
     }
 });
 
